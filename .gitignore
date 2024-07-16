@@ -1,0 +1,10 @@
+# Ignora la cartella node_modules
+node_modules/
+
+# Altri esempi di cose che potresti voler ignorare
+dist/
+build/
+.idea/
+.env
+.DS_Store
+

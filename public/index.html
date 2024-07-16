@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarShareConnect</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.css" /> <!-- Aggiunto -->
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script defer src="app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>CarShareConnect</h1>
+        </div>
+        <div class="login">
+            <button id="startButton">Entra e accetta la geolocalizzazione</button>
+        </div>
+        <div id="mapContainer" class="hidden">
+            <div id="map"></div>
+        </div>
+    </div>
+</body>
+</html>
+
