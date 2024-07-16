@@ -37,13 +37,13 @@ function initMap(position) {
 
     var socket = io();
     var userMarker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(map)
-        .bindPopup("Tu sei qui").openPopup();
+      .bindPopup("Tu sei qui").openPopup();
 
-    socket.emit('new-user', { 
-        latitude: position.coords.latitude, 
-        longitude: position.coords.longitude, 
-        name: "Mario Rossi", 
-        signupDate: "01-01-2024" 
+    socket.emit('new-user', {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        name: "Mario Rossi",
+        signupDate: "01-01-2024"
     });
 
     var markers = {};
@@ -64,11 +64,56 @@ function initMap(position) {
                 console.log('Aggiungo marker per l\'utente:', user);
                 if (!markers[user.id]) {
                     var marker = L.marker([user.latitude, user.longitude]).addTo(map)
-                        .bindPopup(`<b>${user.name}</b><br>Iscritto dal: ${user.signupDate}`);
+                      .bindPopup(`<b>${user.name}</b><br>Iscritto dal: ${user.signupDate}`);
                     markers[user.id] = marker;
                 }
             }
         });
     });
+
+    // Genera utenti fake e aggiorna le loro posizioni
+    var fakeUsers = generateFakeUsers(position.coords.latitude, position.coords.longitude, 10);
+    updateFakeUserPositions(fakeUsers, socket, map, markers);
 }
 
+function generateFakeUsers(lat, lon, count) {
+    var fakeUsers = [];
+    for (var i = 0; i < count; i++) {
+        fakeUsers.push({
+            id: 'fakeUser' + i,
+            name: 'Fake User ' + i,
+            latitude: lat + (Math.random() - 0.5) * 0.02,
+            longitude: lon + (Math.random() - 0.5) * 0.02,
+            signupDate: '01-01-2024'
+        });
+    }
+    return fakeUsers;
+}
+
+function updateFakeUserPositions(fakeUsers, socket, map, markers) {
+    setInterval(function() {
+        fakeUsers.forEach(function(user) {
+            // Aggiorna la posizione come se l'utente fosse in auto
+            user.latitude += (Math.random() - 0.5) * 0.0001;
+            user.longitude += (Math.random() - 0.5) * 0.0001;
+
+            // Aggiorna il marker sulla mappa
+            if (markers[user.id]) {
+                markers[user.id].setLatLng([user.latitude, user.longitude]);
+            } else {
+                var marker = L.marker([user.latitude, user.longitude]).addTo(map)
+                  .bindPopup(`<b>${user.name}</b><br>Iscritto dal: ${user.signupDate}`);
+                markers[user.id] = marker;
+            }
+
+            // Invia la nuova posizione al server
+            socket.emit('update-user', {
+                id: user.id,
+                latitude: user.latitude,
+                longitude: user.longitude,
+                name: user.name,
+                signupDate: user.signupDate
+            });
+        });
+    }, 500); // Aggiorna ogni 0.5 secondi
+}
