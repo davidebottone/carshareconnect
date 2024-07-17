@@ -1,9 +1,33 @@
 document.getElementById('startButton').addEventListener('click', function() {
+    if (!auth.isAuthenticated()) {
+        auth.login();
+    } else {
+        startApp();
+    }
+});
+
+window.addEventListener('load', () => {
+    if (window.location.pathname === '/callback.html') {
+        auth.handleAuthentication().then(() => {
+            window.location = '/';
+        }).catch(err => {
+            console.error(err);
+        });
+    } else if (auth.isAuthenticated()) {
+        startApp();
+    }
+});
+
+function startApp() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(initMap, showError);
     } else {
         alert("Geolocalizzazione non supportata dal tuo browser.");
     }
+}
+
+document.getElementById('logoutButton').addEventListener('click', function() {
+    auth.logout();
 });
 
 function showError(error) {

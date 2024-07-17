@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.auth0.com/js/auth0/9.19.0/auth0.min.js"></script> <!-- Includi Auth0 -->
+    <script src="auth.js"></script>
     <script defer src="app.js"></script>
-
 </head>
 <body>
 <div class="container">
@@ -26,9 +27,7 @@
             <ul class="menu__box">
                 <li><a class="menu__item" href="#">Home</a></li>
                 <li><a class="menu__item" href="#">Profilo</a></li>
-                <li><a class="menu__item" href="#">Viaggi</a></li>
-                <li><a class="menu__item" href="#">Impostazioni</a></li>
-                <li><a class="menu__item" href="#">Logout</a></li>
+                <li><a class="menu__item" href="#" id="logoutButton">Logout</a></li>
             </ul>
         </div>
     </header>

@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "auth0-js": "^9.26.1",
     "express": "^4.19.2",
     "socket.io": "^4.7.5"
   }

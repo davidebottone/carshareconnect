@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Callback</title>
+</head>
+<body>
+<script src="https://cdn.auth0.com/js/auth0/9.19.0/auth0.min.js"></script> <!-- Includi Auth0 -->
+<script src="auth.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.hash) {
+      window.auth.handleAuthentication()
+        .then(() => {
+          console.log('User authenticated');
+          window.location.href = '/';
+        })
+        .catch(err => {
+          console.error('Authentication error:', err);
+        });
+    }
+  });
+</script>
+</body>
+</html>
