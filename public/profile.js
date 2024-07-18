@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('surname').value = user.surname;
     if (user.profileImage) {
       const profileImageElement = document.createElement('img');
-      profileImageElement.src = `/uploads/${user.profileImage}`;
+      profileImageElement.src = `/public/uploads/${user.profileImage}`;
       profileImageElement.id = 'profileImagePreview';
       document.getElementById('profileForm').prepend(profileImageElement);
     }

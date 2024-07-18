@@ -60,46 +60,78 @@ function initMap(position) {
     map.invalidateSize();
 
     var socket = io();
-    var userMarker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(map)
-      .bindPopup("Tu sei qui").openPopup();
 
-    socket.emit('new-user', {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        name: "Mario Rossi",
-        signupDate: "01-01-2024",
-        auth0Id: localStorage.getItem('user_id')
-    });
+    var userId = localStorage.getItem('user_id');
+    fetch(`/api/profile/${userId}`)
+      .then(response => response.json())
+      .then(user => {
+          var userMarker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(map)
+            .bindPopup(`<img src="/uploads/${user.profileImage}" alt="${user.name} ${user.surname}" class="avatar"><br><b>${user.name} ${user.surname}</b><br>Interessi: ${user.interests.join(', ')}`).openPopup();
 
-    var markers = {};
+          socket.emit('new-user', {
+              auth0Id: user.auth0Id,
+              name: user.name,
+              surname: user.surname,
+              profileImage: user.profileImage,
+              interests: user.interests,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              signupDate: user.signupDate
+          });
 
-    socket.on('update-users', function(users) {
-        console.log('Ricevuta lista utenti:', users);
+          var markers = {};
 
-        // Rimuovi tutti i marker esistenti eccetto il proprio
-        for (let id in markers) {
-            if (id !== socket.id) {
-                map.removeLayer(markers[id]);
-                delete markers[id];
-            }
-        }
+          socket.on('update-users', function(users) {
+              console.log('Ricevuta lista utenti:', users);
 
-        users.forEach(function(user) {
-            if (user.id !== socket.id) {
-                console.log('Aggiungo marker per l\'utente:', user);
-                if (!markers[user.id]) {
-                    var marker = L.marker([user.latitude, user.longitude]).addTo(map)
-                      .bindPopup(`<b>${user.name}</b><br>Iscritto dal: ${user.signupDate}`);
-                    markers[user.id] = marker;
-                }
-            }
-        });
-    });
+              // Rimuovi tutti i marker esistenti eccetto il proprio
+              for (let id in markers) {
+                  if (id !== socket.id) {
+                      map.removeLayer(markers[id]);
+                      delete markers[id];
+                  }
+              }
 
-    // Genera utenti fake e aggiorna le loro posizioni
-    var fakeUsers = generateFakeUsers(position.coords.latitude, position.coords.longitude, 10);
-    updateFakeUserPositions(fakeUsers, socket, map, markers);
+              users.forEach(function(user) {
+                  if (user.id !== socket.id) {
+                      console.log('Aggiungo marker per l\'utente:', user);
+                      if (!markers[user.id]) {
+                          var marker = L.marker([user.latitude, user.longitude]).addTo(map)
+                            .bindPopup(`<img src="/uploads/${user.profileImage}" alt="${user.name} ${user.surname}" class="avatar"><br><b>${user.name} ${user.surname}</b><br>Interessi: ${user.interests.join(', ')}<br>Iscritto dal: ${user.signupDate}`);
+                          markers[user.id] = marker;
+                      }
+                  }
+              });
+          });
+
+          // Genera utenti fake e aggiorna le loro posizioni
+          var fakeUsers = generateFakeUsers(position.coords.latitude, position.coords.longitude, 10);
+          updateFakeUserPositions(fakeUsers, socket, map, markers);
+
+          // Aggiorna la posizione dell'utente corrente ogni 5 secondi
+          setInterval(function() {
+              navigator.geolocation.getCurrentPosition(function(pos) {
+                  var newLat = pos.coords.latitude;
+                  var newLon = pos.coords.longitude;
+
+                  userMarker.setLatLng([newLat, newLon]);
+
+                  socket.emit('update-user', {
+                      id: socket.id,
+                      latitude: newLat,
+                      longitude: newLon,
+                      name: user.name,
+                      surname: user.surname,
+                      profileImage: user.profileImage,
+                      interests: user.interests,
+                      signupDate: user.signupDate
+                  });
+              }, showError);
+          }, 5000); // Aggiorna ogni 5 secondi
+      })
+      .catch(error => console.error('Errore nel recupero dei dati dell\'utente:', error));
 }
+
 
 function generateFakeUsers(lat, lon, count) {
     var fakeUsers = [];

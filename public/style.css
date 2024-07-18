@@ -132,3 +132,11 @@ header {
     background-color: #CFD8DC;
 }
 
+.leaflet-popup-content img {
+    max-width: 50px;
+    border-radius: 50%;
+}
+
+.leaflet-popup-content {
+    text-align: center;
+}
