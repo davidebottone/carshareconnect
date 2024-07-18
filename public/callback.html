@@ -10,16 +10,24 @@
 <script src="auth.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.hash) {
-      window.auth.handleAuthentication()
-        .then(() => {
-          console.log('User authenticated');
-          window.location.href = '/';
-        })
-        .catch(err => {
-          console.error('Authentication error:', err);
-        });
+    function waitForAuth() {
+      if (window.auth && typeof window.auth.handleAuthentication === 'function') {
+        if (window.location.hash) {
+          window.auth.handleAuthentication()
+            .then(() => {
+              console.log('User authenticated');
+              window.location.href = '/';
+            })
+            .catch(err => {
+              console.error('Authentication error:', err);
+            });
+        }
+      } else {
+        setTimeout(waitForAuth, 100); // Riprova dopo 100 ms
+      }
     }
+
+    waitForAuth();
   });
 </script>
 </body>
