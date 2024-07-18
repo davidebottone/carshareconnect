@@ -67,7 +67,8 @@ function initMap(position) {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
         name: "Mario Rossi",
-        signupDate: "01-01-2024"
+        signupDate: "01-01-2024",
+        auth0Id: localStorage.getItem('user_id')
     });
 
     var markers = {};

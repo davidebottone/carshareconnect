@@ -22,14 +22,22 @@ function handleAuthentication() {
         return reject(new Error('No auth result'));
       }
       localStorage.setItem('id_token', authResult.idToken);
-      console.log('Authentication successful, idToken set in localStorage');
-      resolve();
+      auth0Client.client.userInfo(authResult.accessToken, (err, user) => {
+        if (err) {
+          console.error('Error getting user info:', err);
+          return reject(err);
+        }
+        localStorage.setItem('user_id', user.sub);
+        console.log('Authentication successful, user ID set in localStorage');
+        resolve(user);
+      });
     });
   });
 }
 
 function logout() {
   localStorage.removeItem('id_token');
+  localStorage.removeItem('user_id');
   auth0Client.logout({
     returnTo: 'http://localhost:3000',
     clientID: 'ArtLhFsI1OpsAdOSNzTQalULXVcb0HjR',
@@ -47,5 +55,3 @@ window.auth = {
   logout: logout,
   isAuthenticated: isAuthenticated
 };
-
-

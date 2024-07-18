@@ -7,4 +7,4 @@ build/
 .idea/
 .env
 .DS_Store
-
+public/uploads/*
