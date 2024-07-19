@@ -37,6 +37,8 @@ header {
     background-color: #f8f8f8;
     position: fixed;
     z-index: 999;
+    top: 0px;
+    left: 0px;
     width: 100%;
 }
 
