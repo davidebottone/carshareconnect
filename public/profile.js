@@ -48,7 +48,8 @@ document.getElementById('profileForm').addEventListener('submit', async function
       body: formData
     });
     if (response.ok) {
-      alert('Profilo aggiornato con successo');
+      // Redirect alla home page
+      window.location.href = '/';
     } else {
       alert('Errore nell\'aggiornamento del profilo');
     }

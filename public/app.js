@@ -66,7 +66,7 @@ function initMap(position) {
       .then(response => response.json())
       .then(user => {
           var userMarker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(map)
-            .bindPopup(`<img src="/uploads/${user.profileImage}" alt="${user.name} ${user.surname}" class="avatar"><br><b>${user.name} ${user.surname}</b><br>Interessi: ${user.interests.join(', ')}`).openPopup();
+            .bindPopup(getUserPopup(user)).openPopup();
 
           socket.emit('new-user', {
               auth0Id: user.auth0Id,
@@ -97,16 +97,13 @@ function initMap(position) {
                       console.log('Aggiungo marker per l\'utente:', user);
                       if (!markers[user.id]) {
                           var marker = L.marker([user.latitude, user.longitude]).addTo(map)
-                            .bindPopup(`<img src="/uploads/${user.profileImage}" alt="${user.name} ${user.surname}" class="avatar"><br><b>${user.name} ${user.surname}</b><br>Interessi: ${user.interests.join(', ')}<br>Iscritto dal: ${user.signupDate}`);
+                            .bindPopup(getUserPopup(user));
                           markers[user.id] = marker;
                       }
                   }
               });
           });
 
-          // Genera utenti fake e aggiorna le loro posizioni
-          var fakeUsers = generateFakeUsers(position.coords.latitude, position.coords.longitude, 10);
-          updateFakeUserPositions(fakeUsers, socket, map, markers);
 
           // Aggiorna la posizione dell'utente corrente ogni 5 secondi
           setInterval(function() {
@@ -133,44 +130,6 @@ function initMap(position) {
 }
 
 
-function generateFakeUsers(lat, lon, count) {
-    var fakeUsers = [];
-    for (var i = 0; i < count; i++) {
-        fakeUsers.push({
-            id: 'fakeUser' + i,
-            name: 'Fake User ' + i,
-            latitude: lat + (Math.random() - 0.5) * 0.02,
-            longitude: lon + (Math.random() - 0.5) * 0.02,
-            signupDate: '01-01-2024'
-        });
-    }
-    return fakeUsers;
-}
-
-function updateFakeUserPositions(fakeUsers, socket, map, markers) {
-    setInterval(function() {
-        fakeUsers.forEach(function(user) {
-            // Aggiorna la posizione come se l'utente fosse in auto
-            user.latitude += (Math.random() - 0.5) * 0.0001;
-            user.longitude += (Math.random() - 0.5) * 0.0001;
-
-            // Aggiorna il marker sulla mappa
-            if (markers[user.id]) {
-                markers[user.id].setLatLng([user.latitude, user.longitude]);
-            } else {
-                var marker = L.marker([user.latitude, user.longitude]).addTo(map)
-                  .bindPopup(`<b>${user.name}</b><br>Iscritto dal: ${user.signupDate}`);
-                markers[user.id] = marker;
-            }
-
-            // Invia la nuova posizione al server
-            socket.emit('update-user', {
-                id: user.id,
-                latitude: user.latitude,
-                longitude: user.longitude,
-                name: user.name,
-                signupDate: user.signupDate
-            });
-        });
-    }, 500); // Aggiorna ogni 0.5 secondi
+function getUserPopup(user) {
+    return `<img src="/uploads/${user.profileImage}" alt="${user.name} ${user.surname}" class="avatar"><br><b>${user.name} ${user.surname}</b><br>Interessi: ${user.interests.join(', ')}<br>Iscritto dal: ${user.signupDate}`;
 }
