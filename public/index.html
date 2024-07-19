@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdn.auth0.com/js/auth0/9.19.0/auth0.min.js"></script> <!-- Includi Auth0 -->
+    <script src="https://cdn.auth0.com/js/auth0/9.19.0/auth0.min.js"></script>
     <script src="auth.js"></script>
     <script defer src="app.js"></script>
 </head>
@@ -33,6 +33,35 @@
     </header>
     <div class="login">
         <button id="startButton">Entra e accetta la geolocalizzazione</button>
+    </div>
+    <div id="optionContainer" class="hidden">
+        <button id="giveRideButton">Dai un passaggio</button>
+        <button id="requestRideButton">Chiedi un passaggio</button>
+    </div>
+    <div id="profileFormContainer" class="hidden">
+        <form id="profileForm">
+            <label for="name">Nome:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="surname">Cognome:</label>
+            <input type="text" id="surname" name="surname" required>
+            <label for="profileImage">Immagine di Profilo:</label>
+            <input type="file" id="profileImage" name="profileImage" accept="image/*">
+            <label for="interests">Interessi:</label>
+            <input type="text" id="interests" name="interests" placeholder="Separati da virgola">
+            <div id="giveRideForm" class="hidden">
+                <label for="carModel">Modello Auto:</label>
+                <input type="text" id="carModel" name="carModel">
+                <label for="licensePlate">Targa:</label>
+                <input type="text" id="licensePlate" name="licensePlate">
+            </div>
+            <div id="requestRideForm" class="hidden">
+                <label for="destination">Destinazione:</label>
+                <input type="text" id="destination" name="destination">
+                <label for="notes">Note:</label>
+                <textarea id="notes" name="notes"></textarea>
+            </div>
+            <button type="submit">Salva</button>
+        </form>
     </div>
     <div id="mapContainer" class="hidden">
         <div id="map"></div>

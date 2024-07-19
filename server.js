@@ -26,7 +26,11 @@ const userSchema = new mongoose.Schema({
     interests: [String],
     latitude: Number,
     longitude: Number,
-    signupDate: String
+    signupDate: String,
+    carModel: String,       // Nuovo campo
+    licensePlate: String,   // Nuovo campo
+    destination: String,    // Nuovo campo
+    notes: String           // Nuovo campo
 });
 
 const User = mongoose.model('User', userSchema);
@@ -46,7 +50,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Endpoint per ottenere i dati del profilo dell'utente
 app.get('/api/profile/:auth0Id', async (req, res) => {
     try {
         console.log(`Fetching user with auth0Id: ${req.params.auth0Id}`);
@@ -61,7 +64,6 @@ app.get('/api/profile/:auth0Id', async (req, res) => {
     }
 });
 
-// Endpoint per ottenere le variabili di ambiente
 app.get('/api/env', (req, res) => {
     res.json({
         AUTH0_DOMAIN: process.env.AUTH0_DOMAIN,
@@ -73,7 +75,7 @@ app.get('/api/env', (req, res) => {
 
 app.post('/api/profile', upload.single('profileImage'), async (req, res) => {
     try {
-        const { auth0Id, name, surname, interests } = req.body;
+        const { auth0Id, name, surname, interests, carModel, licensePlate, destination, notes } = req.body;
         console.log(`Received data: ${JSON.stringify(req.body)}`); // Log dei dati ricevuti
         const profileImage = req.file ? req.file.filename : null;
 
@@ -82,8 +84,14 @@ app.post('/api/profile', upload.single('profileImage'), async (req, res) => {
             // Aggiorna il profilo esistente
             user.name = name;
             user.surname = surname;
-            user.profileImage = profileImage;
             user.interests = interests.split(',').map(interest => interest.trim());
+            user.carModel = carModel || user.carModel;
+            user.licensePlate = licensePlate || user.licensePlate;
+            user.destination = destination || user.destination;
+            user.notes = notes || user.notes;
+            if (profileImage) {
+                user.profileImage = profileImage;
+            }
             await user.save();
         } else {
             // Crea un nuovo profilo
@@ -93,6 +101,10 @@ app.post('/api/profile', upload.single('profileImage'), async (req, res) => {
                 surname,
                 profileImage,
                 interests: interests.split(',').map(interest => interest.trim()),
+                carModel,
+                licensePlate,
+                destination,
+                notes,
                 latitude: 0,
                 longitude: 0,
                 signupDate: new Date().toISOString()
@@ -105,7 +117,6 @@ app.post('/api/profile', upload.single('profileImage'), async (req, res) => {
         res.status(500).json({ message: 'Errore nell\'aggiornamento del profilo' });
     }
 });
-
 let users = [];
 
 io.on('connection', (socket) => {
@@ -138,8 +149,6 @@ io.on('connection', (socket) => {
         console.log('Utente disconnesso, lista utenti aggiornata:', users);
     });
 });
-
-
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server in ascolto sulla porta ${PORT}`));

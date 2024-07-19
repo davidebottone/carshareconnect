@@ -11,4 +11,4 @@ public/uploads/*
 !public/uploads/
 !public/uploads/.gitkeep
 *.sh
-
+prompt.txt
